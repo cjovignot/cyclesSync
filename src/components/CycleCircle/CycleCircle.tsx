@@ -1,4 +1,3 @@
-import React from "react";
 import type { CycleCircleProps } from "../../types";
 
 export function CycleCircle({
