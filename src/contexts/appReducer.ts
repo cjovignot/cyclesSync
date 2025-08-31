@@ -1,10 +1,12 @@
 import type { AppState, AppAction } from "../types";
 import type { DashboardStats } from "../types";
+import dayjs from "dayjs";
 import {
   calculateCycleLength,
   calculatePeriodLength,
   getCurrentCycleDay,
   predictNextPeriod,
+  predictOvulation,
 } from "../utils/cycleCalculations";
 
 // -------------------- Reducer --------------------
@@ -27,6 +29,69 @@ export function appReducer(state: AppState, action: AppAction): AppState {
         ),
       };
 
+    case "UPDATE_DAY": {
+      const { date, data } = action.payload;
+
+      let dayUpdated = false;
+      const updatedCycles = state.cycles.map((cycle) => {
+        const dayExists = cycle.days.find((d) =>
+          dayjs(d.date).isSame(dayjs(date), "day")
+        );
+
+        if (dayExists) {
+          dayUpdated = true;
+          return {
+            ...cycle,
+            days: cycle.days.map((d) =>
+              dayjs(d.date).isSame(dayjs(date), "day") ? { ...d, ...data } : d
+            ),
+          };
+        }
+        return cycle;
+      });
+
+      if (!dayUpdated) {
+        // Vérifier si ce jour se rattache à un cycle existant
+        const adjacentCycleIndex = state.cycles.findIndex((cycle) => {
+          const cycleDates = cycle.days.map((d) => dayjs(d.date));
+          return cycleDates.some(
+            (d) =>
+              dayjs(date).isSame(d.add(1, "day"), "day") ||
+              dayjs(date).isSame(d.subtract(1, "day"), "day")
+          );
+        });
+
+        if (adjacentCycleIndex >= 0) {
+          // Ajouter le jour à un cycle existant
+          const newCycles = [...updatedCycles];
+          const currentStart = dayjs(newCycles[adjacentCycleIndex].startDate);
+          const newStart = dayjs(date);
+          newCycles[adjacentCycleIndex] = {
+            ...newCycles[adjacentCycleIndex],
+            days: [
+              ...newCycles[adjacentCycleIndex].days,
+              { date, ...data },
+            ].sort((a, b) => dayjs(a.date).unix() - dayjs(b.date).unix()),
+            startDate: currentStart.isBefore(newStart)
+              ? currentStart.format("YYYY-MM-DD")
+              : newStart.format("YYYY-MM-DD"),
+          };
+          return { ...state, cycles: newCycles };
+        } else {
+          // Créer un nouveau cycle avec ce jour seul
+          const newCycle = {
+            id: `cycle-${Date.now()}`,
+            userId: state.user?.id || "guest",
+            startDate: date,
+            days: [{ date, ...data }],
+          };
+          return { ...state, cycles: [...updatedCycles, newCycle] };
+        }
+      }
+
+      return { ...state, cycles: updatedCycles };
+    }
+
     case "SET_PREFERENCES":
       return { ...state, preferences: action.payload };
 
@@ -44,16 +109,40 @@ export function appReducer(state: AppState, action: AppAction): AppState {
         return { ...state, stats: null };
       }
 
+      // Calculer moyenne des cycles et périodes
       const avgCycleLength = calculateCycleLength(state.cycles);
       const avgPeriodLength = calculatePeriodLength(state.cycles);
+
+      // Récupérer le dernier cycle complet
       const lastCycle = state.cycles[state.cycles.length - 1];
+      const firstPeriodDay = lastCycle.days
+        .filter((d) => d.isPeriod)
+        .sort((a, b) => dayjs(a.date).unix() - dayjs(b.date).unix())[0];
       const lastPeriodDate =
-        lastCycle?.startDate || new Date().toISOString().split("T")[0];
+        firstPeriodDay?.date || dayjs().format("YYYY-MM-DD");
+
       const nextPredictedPeriod = predictNextPeriod(
         lastPeriodDate,
         avgCycleLength
       );
+      const predictedOvulation = predictOvulation(
+        lastPeriodDate,
+        avgCycleLength
+      );
       const currentCycleDay = getCurrentCycleDay(lastPeriodDate);
+
+      // Mettre à jour le dernier cycle avec les prédictions
+      const updatedCycles = state.cycles.map((cycle, idx) => ({
+        ...cycle,
+        predictedNextPeriod:
+          idx === state.cycles.length - 1
+            ? nextPredictedPeriod
+            : cycle.predictedNextPeriod,
+        predictedOvulation:
+          idx === state.cycles.length - 1
+            ? predictedOvulation
+            : cycle.predictedOvulation,
+      }));
 
       const stats: DashboardStats = {
         averageCycleLength: avgCycleLength,
@@ -64,7 +153,7 @@ export function appReducer(state: AppState, action: AppAction): AppState {
         totalCycles: state.cycles.length,
       };
 
-      return { ...state, stats };
+      return { ...state, stats, cycles: updatedCycles };
     }
 
     default:

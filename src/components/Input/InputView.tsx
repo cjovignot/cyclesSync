@@ -32,10 +32,10 @@ export function InputView() {
   });
 
   useEffect(() => {
-    // Load existing data for selected date
+    // Charger les données existantes pour la date sélectionnée
     const existingDay = state.cycles
       .flatMap((c) => c.days ?? [])
-      .find((d) => d.date === selectedDate);
+      .find((d) => dayjs(d.date).format("YYYY-MM-DD") === selectedDate);
 
     if (existingDay) {
       setFormData({
@@ -46,12 +46,42 @@ export function InputView() {
         sexualActivity: existingDay.sexualActivity ?? false,
         sexualActivityProtected: existingDay.sexualActivityProtected ?? false,
       });
+    } else {
+      // Réinitialiser le formulaire si aucune donnée existante
+      setFormData({
+        isPeriod: false,
+        symptoms: [],
+        temperature: "",
+        notes: "",
+        sexualActivity: false,
+        sexualActivityProtected: false,
+      });
     }
   }, [selectedDate, state.cycles]);
 
   const handleSave = () => {
-    // Ici tu peux dispatcher une action pour sauvegarder la journée
-    console.log("Saving data for", selectedDate, formData);
+    // Mettre à jour ou créer la journée dans le reducer
+    dispatch({
+      type: "UPDATE_DAY",
+      payload: {
+        date: selectedDate,
+        data: {
+          isPeriod: formData.isPeriod,
+          symptoms: formData.symptoms,
+          temperature: formData.temperature
+            ? Number(formData.temperature)
+            : undefined,
+          notes: formData.notes,
+          sexualActivity: formData.sexualActivity,
+          sexualActivityProtected: formData.sexualActivityProtected,
+        },
+      },
+    });
+
+    // Recalculer les stats après modification
+    dispatch({ type: "CALCULATE_STATS" });
+
+    // Retour au calendrier
     dispatch({ type: "SET_VIEW", payload: "calendar" });
   };
 
@@ -61,28 +91,23 @@ export function InputView() {
   };
 
   return (
-    <div className="mx-auto p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+    <div className="p-4 mx-auto">
+      <div className="bg-white border border-gray-200 shadow-sm dark:bg-gray-800 rounded-xl dark:border-gray-700">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center">
-            <Calendar className="h-6 w-6 text-primary-600 dark:text-primary-400 mr-3" />
+            <Calendar className="w-6 h-6 mr-3 text-primary-600 dark:text-primary-400" />
             <div>
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                 {dayjs(selectedDate).format("dddd DD MMMM YYYY")}
               </h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Jour{" "}
-                {dayjs(selectedDate).diff(dayjs().startOf("year"), "day") + 1}{" "}
-                de l'année
-              </p>
             </div>
           </div>
           <button
             onClick={handleCancel}
-            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            className="p-2 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
           >
-            <X className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+            <X className="w-5 h-5 text-gray-600 dark:text-gray-400" />
           </button>
         </div>
 
@@ -129,18 +154,18 @@ export function InputView() {
         </div>
 
         {/* Actions */}
-        <div className="flex justify-end space-x-3 p-6 border-t border-gray-200 dark:border-gray-700">
+        <div className="flex justify-end p-6 space-x-3 border-t border-gray-200 dark:border-gray-700">
           <button
             onClick={handleCancel}
-            className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            className="px-4 py-2 text-gray-700 transition-colors rounded-lg dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
           >
             Annuler
           </button>
           <button
             onClick={handleSave}
-            className="px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors flex items-center"
+            className="flex items-center px-6 py-2 text-white transition-colors rounded-lg bg-primary-600 hover:bg-primary-700"
           >
-            <Save className="h-4 w-4 mr-2" />
+            <Save className="w-4 h-4 mr-2" />
             Enregistrer
           </button>
         </div>

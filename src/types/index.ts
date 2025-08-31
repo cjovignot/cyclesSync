@@ -73,11 +73,11 @@ export interface UserPreferences {
 }
 
 export interface DashboardStats {
+  currentCycleDay: number;
+  nextPredictedPeriod: string;
   averageCycleLength: number;
   averagePeriodLength: number;
   lastPeriodDate: string;
-  nextPredictedPeriod: string;
-  currentCycleDay: number;
   totalCycles: number;
 }
 
@@ -112,4 +112,18 @@ export type AppAction =
   | { type: "SET_VIEW"; payload: AppState["currentView"] }
   | { type: "SET_SELECTED_DATE"; payload: string | null }
   | { type: "SET_LOADING"; payload: boolean }
+  | { type: "UPDATE_DAY"; payload: { date: string; data: Partial<CycleDay> } }
   | { type: "CALCULATE_STATS" };
+
+export interface CalendarDayType extends CycleDay {
+  isPredictedPeriod?: boolean;
+  isPredictedOvulation?: boolean;
+  isOvulation?: boolean;
+  isFertile?: boolean;
+}
+
+export interface Predictions {
+  nextPeriod: string;
+  ovulation: string;
+  fertileWindow: { start: string; end: string };
+}

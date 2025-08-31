@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import type { CycleDay, Cycle } from "../types";
+import type { Cycle, CalendarDayType, Predictions } from "../types";
 
 export const calculateCycleLength = (cycles: Cycle[]): number => {
   if (cycles.length < 2) return 28; // Default cycle length
@@ -36,20 +36,42 @@ export const calculatePeriodLength = (cycles: Cycle[]): number => {
   );
 };
 
+/**
+ * Prédit la prochaine date de règles
+ * @param lastPeriodStart - date de début de la dernière période (ISO string)
+ * @param averageCycleLength - longueur moyenne du cycle en jours
+ * @returns date ISO de la prochaine période
+ */
 export const predictNextPeriod = (
-  lastPeriodDate: string,
+  lastPeriodStart: string,
   averageCycleLength: number
 ): string => {
-  return dayjs(lastPeriodDate)
-    .add(averageCycleLength, "day")
-    .format("YYYY-MM-DD");
+  let nextPeriod = dayjs(lastPeriodStart).add(averageCycleLength, "day");
+
+  // Si la date prédite est passée, itérer jusqu'à trouver une date future
+  while (nextPeriod.isBefore(dayjs(), "day")) {
+    nextPeriod = nextPeriod.add(averageCycleLength, "day");
+  }
+
+  return nextPeriod.format("YYYY-MM-DD");
 };
 
+/**
+ * Prédit la date d'ovulation en se basant sur la dernière date de règles
+ * et la durée moyenne du cycle.
+ *
+ * @param lastPeriodDate - Date du dernier début de règles (YYYY-MM-DD)
+ * @param averageCycleLength - Durée moyenne du cycle en jours
+ * @returns Date prévue d'ovulation au format YYYY-MM-DD
+ */
 export const predictOvulation = (
   lastPeriodDate: string,
   averageCycleLength: number
 ): string => {
-  const ovulationDay = averageCycleLength - 14; // Ovulation typically 14 days before next period
+  // L’ovulation se produit généralement 14 jours avant le début des prochaines règles
+  const ovulationDay = averageCycleLength - 14;
+
+  // Ajouter ovulationDay à la dernière date de règles
   return dayjs(lastPeriodDate).add(ovulationDay, "day").format("YYYY-MM-DD");
 };
 
@@ -69,41 +91,45 @@ export const getCurrentCycleDay = (lastPeriodDate: string): number => {
   return today.diff(lastPeriod, "day") + 1;
 };
 
-export const generateCalendarDays = (
+export function generateCalendarDays(
   year: number,
   month: number,
   cycles: Cycle[],
-  predictions: {
-    nextPeriod: string;
-    ovulation: string;
-    fertileWindow: { start: string; end: string };
-  }
-): CycleDay[] => {
+  predictions: Predictions
+): CalendarDayType[] {
   const startOfMonth = dayjs().year(year).month(month).startOf("month");
-  const endOfMonth = startOfMonth.endOf("month");
-  const startOfCalendar = startOfMonth.startOf("week");
-  const endOfCalendar = endOfMonth.endOf("week");
+  const endOfMonth = dayjs().year(year).month(month).endOf("month");
 
-  const days: CycleDay[] = [];
-  let current = startOfCalendar;
+  const days: CalendarDayType[] = [];
+  let current = startOfMonth.startOf("week"); // début du calendrier à la semaine
 
-  while (current.isBefore(endOfCalendar) || current.isSame(endOfCalendar)) {
+  while (current.isBefore(endOfMonth.endOf("week"))) {
     const dateStr = current.format("YYYY-MM-DD");
-    const existingDay = cycles
-      .flatMap((c) => c.days)
-      .find((d) => d.date === dateStr);
 
-    const day: CycleDay = {
+    // Chercher si c’est un jour déjà enregistré dans les cycles
+    let existingDay;
+    for (const cycle of cycles) {
+      existingDay = cycle.days.find(
+        (d) => dayjs(d.date).format("YYYY-MM-DD") === dateStr
+      );
+      if (existingDay) break;
+    }
+
+    const day: CalendarDayType = {
       date: dateStr,
-      ...existingDay,
-      isPredictedPeriod: current.isSame(predictions.nextPeriod, "day"),
-      isPredictedOvulation: current.isSame(predictions.ovulation, "day"),
-      isFertile: current.isBetween(
-        predictions.fertileWindow.start,
-        predictions.fertileWindow.end,
-        "day",
-        "[]"
-      ),
+      isPeriod: existingDay?.isPeriod ?? false,
+      symptoms: existingDay?.symptoms ?? [],
+      temperature: existingDay?.temperature,
+      notes: existingDay?.notes,
+      sexualActivity: existingDay?.sexualActivity,
+      sexualActivityProtected: existingDay?.sexualActivityProtected,
+      // Prédictions
+      isPredictedPeriod: dateStr === predictions.nextPeriod,
+      isPredictedOvulation: dateStr === predictions.ovulation,
+      isOvulation: dateStr === predictions.ovulation,
+      isFertile:
+        dateStr >= predictions.fertileWindow.start &&
+        dateStr <= predictions.fertileWindow.end,
     };
 
     days.push(day);
@@ -111,4 +137,4 @@ export const generateCalendarDays = (
   }
 
   return days;
-};
+}
