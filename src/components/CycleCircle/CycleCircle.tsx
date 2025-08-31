@@ -1,97 +1,84 @@
-import { useApp } from "../../contexts/AppContext";
-import dayjs from "dayjs";
-import clsx from "clsx";
+import React from "react";
+import type { CycleCircleProps } from "../../types";
 
-export function CycleCircle() {
-  const { state } = useApp();
+export function CycleCircle({
+  averageCycleLength,
+  currentCycleDay,
+  periodDays,
+  predictedPeriodDays,
+  ovulationDay,
+  fertileWindow,
+}: CycleCircleProps) {
+  const size = 250; // taille du cercle
+  const strokeWidth = 20;
+  const radius = (size - strokeWidth) / 2;
+  const center = size / 2;
 
-  const lastCycle = state.cycles[state.cycles.length - 1];
+  const degreePerDay = 360 / averageCycleLength;
 
-  if (!lastCycle || !lastCycle.days || lastCycle.days.length === 0) {
+  // Générer les arcs pour les périodes
+  const getArc = (day: number, color: string) => {
+    const startAngle = (day - 1) * degreePerDay - 90;
+    const endAngle = day * degreePerDay - 90;
+    const start = polarToCartesian(center, center, radius, endAngle);
+    const end = polarToCartesian(center, center, radius, startAngle);
+
+    const largeArcFlag = endAngle - startAngle <= 180 ? 0 : 1;
+
     return (
-      <div className="p-6 text-center text-gray-700 dark:text-gray-300">
-        Aucun cycle disponible pour afficher le cercle.
-      </div>
+      <path
+        d={`M ${start.x} ${start.y} A ${radius} ${radius} 0 ${largeArcFlag} 0 ${end.x} ${end.y}`}
+        stroke={color}
+        strokeWidth={strokeWidth}
+        fill="none"
+        strokeLinecap="round"
+      />
     );
+  };
+
+  function polarToCartesian(
+    cx: number,
+    cy: number,
+    r: number,
+    angleDeg: number
+  ) {
+    const angleRad = (angleDeg * Math.PI) / 180;
+    return {
+      x: cx + r * Math.cos(angleRad),
+      y: cy + r * Math.sin(angleRad),
+    };
   }
 
-  const cycleDays = lastCycle.days;
-  const cycleLength = cycleDays.length;
-
-  const todayStr = dayjs().format("YYYY-MM-DD");
-
-  // On crée un tableau avec un objet par jour
-  const daysArray = cycleDays.map((day, idx) => {
-    const isToday = day.date === todayStr;
-    return {
-      ...day,
-      dayNumber: idx + 1,
-      isToday,
-      color: day.isPeriod
-        ? "bg-red-500"
-        : day.isPredictedPeriod
-        ? "bg-red-300"
-        : day.isOvulation
-        ? "bg-blue-500"
-        : day.isPredictedOvulation
-        ? "bg-blue-300"
-        : day.isFertile
-        ? "bg-green-300"
-        : "bg-gray-200",
-    };
-  });
-
-  const radius = 120; // rayon du cercle
-  const center = radius + 20;
-  const angleStep = (2 * Math.PI) / cycleLength;
-
   return (
-    <div className="flex flex-col items-center p-6">
-      <h2 className="mb-6 text-xl font-semibold text-gray-900 dark:text-white">
-        Cycle actuel ({cycleLength} jours)
-      </h2>
+    <div className="flex justify-center">
+      <svg width={size} height={size}>
+        <circle
+          cx={center}
+          cy={center}
+          r={radius}
+          stroke="#e5e7eb"
+          strokeWidth={strokeWidth}
+          fill="none"
+        />
 
-      <svg
-        width={2 * center}
-        height={2 * center}
-        viewBox={`0 0 ${2 * center} ${2 * center}`}
-      >
-        {daysArray.map((day, idx) => {
-          const angle = -Math.PI / 2 + idx * angleStep; // commence en haut
-          const x = center + radius * Math.cos(angle);
-          const y = center + radius * Math.sin(angle);
+        {/* Période passée */}
+        {periodDays.map((day) => getArc(day, "#f87171"))}
 
-          return (
-            <circle
-              key={idx}
-              cx={x}
-              cy={y}
-              r={12}
-              className={clsx(
-                day.color,
-                day.isToday && "stroke-yellow-400 stroke-2"
-              )}
-            />
-          );
-        })}
+        {/* Période prédite */}
+        {predictedPeriodDays.map((day) => getArc(day, "#fca5a5"))}
+
+        {/* Fenêtre fertile */}
+        {Array.from(
+          { length: fertileWindow.end - fertileWindow.start + 1 },
+          (_, i) => getArc(fertileWindow.start + i, "#34d399")
+        )}
+
+        {/* Ovulation */}
+        {getArc(ovulationDay, "#3b82f6")}
+
+        {/* Jour actuel */}
+        {getArc(currentCycleDay, "#facc15")}
       </svg>
-
-      <div className="grid grid-cols-2 gap-4 mt-6 md:grid-cols-4">
-        <LegendItem color="bg-red-500" label="Règles" />
-        <LegendItem color="bg-red-300" label="Règles prév." />
-        <LegendItem color="bg-blue-500" label="Ovulation" />
-        <LegendItem color="bg-green-300" label="Fenêtre fertile" />
-        <LegendItem color="bg-yellow-400" label="Jour actuel" />
-      </div>
-    </div>
-  );
-}
-
-function LegendItem({ color, label }: { color: string; label: string }) {
-  return (
-    <div className="flex items-center">
-      <div className={clsx("w-4 h-4 mr-2 rounded-full", color)}></div>
-      <span className="text-sm text-gray-700 dark:text-gray-300">{label}</span>
     </div>
   );
 }
