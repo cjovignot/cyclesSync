@@ -46,9 +46,9 @@ export function Navigation({ isOpen, onClose }: NavigationProps) {
       {/* Sidebar */}
       <nav
         className={clsx(
-          "max-sm:rounded-2xl max-sm:h-fit fixed max-sm:top-2 max-sm:left-2 bottom-0 w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 transform transition-transform duration-300 ease-in-out z-50",
+          "max-sm:rounded-2xl max-sm:h-fit fixed max-sm:top-2 max-sm:left-0 bottom-0 w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 transform transition-transform duration-300 ease-in-out z-50",
           "md:relative md:top-0 md:transform-none md:block",
-          isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+          isOpen ? "translate-x-2" : "-translate-x-full md:translate-x-0"
         )}
       >
         <div className="p-4">
