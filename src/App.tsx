@@ -2,13 +2,14 @@ import { useState } from "react";
 import { AppProvider, useApp } from "./contexts/AppContext";
 import { Header } from "./components/Layout/Header";
 import { Navigation } from "./components/Layout/Navigation";
-import { CalendarView } from "./components/Calendar/CalendarView";
 import { DashboardView } from "./components/Dashboard/DashboardView";
+import { CycleCircleView } from "./components/CycleCircle/CycleCircleView";
 import { InputView } from "./components/Input/InputView";
 import { SettingsView } from "./components/Settings/SettingsView";
 import { AuthView } from "./components/Auth/AuthView";
 import { useTheme } from "./hooks/useTheme";
 import { usePWA } from "./hooks/usePWA";
+import { CalendarView } from "./components/Calendar/CalendarView";
 
 function AppContent() {
   const { state } = useApp();
@@ -33,12 +34,16 @@ function AppContent() {
     switch (state.currentView) {
       case "dashboard":
         return <DashboardView />;
+      case "calendar":
+        return <CalendarView />;
       case "input":
         return <InputView />;
       case "settings":
         return <SettingsView />;
+      case "cycle":
+        return <CycleCircleView />;
       default:
-        return <CalendarView />;
+        return <DashboardView />;
     }
   };
 

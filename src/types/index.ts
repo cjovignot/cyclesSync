@@ -86,7 +86,7 @@ export interface AppState {
   user: User | null;
   cycles: Cycle[];
   preferences: UserPreferences;
-  currentView: "calendar" | "dashboard" | "input" | "settings";
+  currentView: "cycle" | "calendar" | "dashboard" | "input" | "settings";
   selectedDate: string | null;
   isLoading: boolean;
   stats: DashboardStats | null;
@@ -127,3 +127,12 @@ export interface Predictions {
   ovulation: string;
   fertileWindow: { start: string; end: string };
 }
+
+export type CycleCircleProps = {
+  averageCycleLength: number;
+  currentCycleDay: number;
+  periodDays: number[];
+  predictedPeriodDays: number[];
+  ovulationDay: number;
+  fertileWindow: { start: number; end: number };
+};

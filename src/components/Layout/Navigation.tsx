@@ -1,4 +1,4 @@
-import { Calendar, BarChart3, Plus, User } from "lucide-react";
+import { Calendar, BarChart3, Plus, User, Circle } from "lucide-react";
 import { useApp } from "../../contexts/AppContext";
 import clsx from "clsx";
 
@@ -20,6 +20,11 @@ export function Navigation({ isOpen, onClose }: NavigationProps) {
       id: "dashboard" as const,
       label: "Tableau de bord",
       icon: BarChart3,
+    },
+    {
+      id: "cycle" as const,
+      label: "Cycle",
+      icon: Circle,
     },
     {
       id: "input" as const,
