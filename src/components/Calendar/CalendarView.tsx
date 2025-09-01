@@ -4,18 +4,19 @@ import dayjs from "dayjs";
 import { useApp } from "../../contexts/AppContext";
 import {
   generateCalendarDays,
-  // predictNextPeriod,
   predictOvulation,
   getFertileWindow,
+  predictSPMWindowCalendar,
 } from "../../utils/cycleCalculations";
 import { CalendarDay } from "./CalendarDay";
-// import clsx from "clsx";
 
 export function CalendarView() {
   const { state, dispatch } = useApp();
   const [currentDate, setCurrentDate] = useState(dayjs());
 
   const stats = state.stats;
+
+  // Si pas de stats, on renvoie un objet vide
   const predictions = stats
     ? {
         nextPeriod: stats.nextPredictedPeriod,
@@ -26,19 +27,43 @@ export function CalendarView() {
         fertileWindow: getFertileWindow(
           predictOvulation(stats.lastPeriodDate, stats.averageCycleLength)
         ),
+        averagePeriodLength: stats.averagePeriodLength,
       }
     : {
         nextPeriod: "",
         ovulation: "",
         fertileWindow: { start: "", end: "" },
+        averagePeriodLength: 5,
       };
 
+  // Calcul des jours de SPM (5 jours avant la période prévue)
+  const predictedPeriodDays = Array.from(
+    { length: predictions.averagePeriodLength },
+    (_, i) => dayjs(predictions.nextPeriod).add(i, "day").date()
+  );
+  const spmDays = predictSPMWindowCalendar(predictedPeriodDays); // renvoie les 5 jours avant
+
+  // Génération des jours du calendrier
   const calendarDays = generateCalendarDays(
     currentDate.year(),
     currentDate.month(),
     state.cycles,
-    predictions
-  );
+    {
+      nextPeriod: predictions.nextPeriod,
+      ovulation: predictions.ovulation,
+      fertileWindow: predictions.fertileWindow,
+    }
+  ).map((day) => {
+    // On ne marque SPM que si le mois de day.date correspond au mois de la prochaine période
+    const nextPeriodMonth = dayjs(predictions.nextPeriod).month();
+    const isSameMonthAsNextPeriod = dayjs(day.date).month() === nextPeriodMonth;
+
+    return {
+      ...day,
+      isSPM:
+        isSameMonthAsNextPeriod && spmDays.includes(dayjs(day.date).date()),
+    };
+  });
 
   const weekDays = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
 
@@ -53,13 +78,12 @@ export function CalendarView() {
     dispatch({ type: "SET_VIEW", payload: "input" });
   };
 
-  const isCurrentMonth = (date: string) => {
-    return dayjs(date).month() === currentDate.month();
-  };
+  const isCurrentMonth = (date: string) =>
+    dayjs(date).month() === currentDate.month();
 
   return (
     <div className="p-4 mx-auto">
-      {/* Calendar Header */}
+      {/* Calendar Header et Grid */}
       <div className="mb-6 bg-white border border-gray-200 shadow-sm dark:bg-gray-800 rounded-xl dark:border-gray-700">
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
           <button
@@ -81,7 +105,6 @@ export function CalendarView() {
           </button>
         </div>
 
-        {/* Calendar Grid */}
         <div className="p-6">
           {/* Week days header */}
           <div className="grid grid-cols-7 gap-1 mb-2">
@@ -104,6 +127,7 @@ export function CalendarView() {
                 isCurrentMonth={isCurrentMonth(day.date)}
                 isToday={dayjs(day.date).isSame(dayjs(), "day")}
                 onClick={() => handleDayClick(day.date)}
+                isSPM={day.isSPM} // <- ici on passe la prédiction SPM
               />
             ))}
           </div>
@@ -117,27 +141,33 @@ export function CalendarView() {
         </h3>
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           <div className="flex items-center">
-            <div className="w-4 h-4 mr-3 bg-red-500 rounded-full"></div>
-            <span className="text-sm text-gray-700 dark:text-gray-300">
+            <div className="w-3 h-3 mr-3 bg-red-500 rounded-full"></div>
+            <span className="text-xs text-gray-700 dark:text-gray-300">
               Règles
             </span>
           </div>
           <div className="flex items-center">
-            <div className="w-4 h-4 mr-3 bg-blue-500 rounded-full"></div>
-            <span className="text-sm text-gray-700 dark:text-gray-300">
-              Ovulation
+            <div className="w-3 h-3 mr-3 border-2 border-red-300 rounded-full"></div>
+            <span className="text-xs text-gray-700 dark:text-gray-300">
+              Prédictions
             </span>
           </div>
           <div className="flex items-center">
-            <div className="w-4 h-4 mr-3 bg-green-300 rounded-full"></div>
-            <span className="text-sm text-gray-700 dark:text-gray-300">
+            <div className="w-3 h-3 mr-3 bg-green-300 rounded-full"></div>
+            <span className="text-xs text-gray-700 dark:text-gray-300">
               Période fertile
             </span>
           </div>
           <div className="flex items-center">
-            <div className="w-4 h-4 mr-3 border-2 border-red-300 rounded-full"></div>
-            <span className="text-sm text-gray-700 dark:text-gray-300">
-              Prédiction
+            <div className="w-3 h-3 mr-3 bg-blue-500 rounded-full"></div>
+            <span className="text-xs text-gray-700 dark:text-gray-300">
+              Ovulation
+            </span>
+          </div>
+          <div className="flex items-center">
+            <div className="w-3 h-3 mr-3 border-2 border-yellow-300 rounded-full"></div>
+            <span className="text-xs text-gray-700 dark:text-gray-300">
+              SPM
             </span>
           </div>
         </div>

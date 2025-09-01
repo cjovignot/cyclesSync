@@ -2,7 +2,6 @@
 import React, { createContext, useContext, useReducer, useEffect } from "react";
 import type { AppState, AppAction } from "../types";
 import { appReducer } from "./appReducer";
-import { initialState } from "../types";
 import { storage } from "../utils/storage";
 // import { generateMockCycles } from "../utils/mockCycles"; // <- notre utilitaire
 
@@ -11,6 +10,16 @@ const AppContext = createContext<{
   state: AppState;
   dispatch: React.Dispatch<AppAction>;
 } | null>(null);
+
+export const initialState: AppState = {
+  user: null,
+  cycles: [],
+  preferences: storage.getPreferences(),
+  currentView: "calendar",
+  selectedDate: null,
+  isLoading: true,
+  stats: null,
+};
 
 // -------------------- Provider --------------------
 export function AppProvider({ children }: { children: React.ReactNode }) {

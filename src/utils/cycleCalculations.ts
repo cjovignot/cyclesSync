@@ -81,8 +81,29 @@ export const getFertileWindow = (
   const ovulation = dayjs(ovulationDate);
   return {
     start: ovulation.subtract(5, "day").format("YYYY-MM-DD"), // 5 days before ovulation
-    end: ovulation.add(1, "day").format("YYYY-MM-DD"), // 1 day after ovulation
+    end: ovulation.add(2, "day").format("YYYY-MM-DD"), // 1 day after ovulation
   };
+};
+
+/**
+ * Prédit la fenêtre de SPM pour un cycle donné
+ * @param predictedPeriodDays - tableau des jours de règles prévus pour **un seul cycle**
+ * @returns tableau des 5 jours précédant le premier jour des règles de ce cycle
+ */
+export const predictSPMWindowCalendar = (
+  predictedPeriodDays: number[]
+): number[] => {
+  if (!predictedPeriodDays || predictedPeriodDays.length === 0) return [];
+
+  const firstDay = predictedPeriodDays[0]; // premier jour des règles pour ce cycle
+  const spmWindow: number[] = [];
+
+  for (let i = 5; i >= 1; i--) {
+    spmWindow.push(firstDay - i);
+  }
+
+  // Les jours négatifs ou nuls peuvent correspondre à la fin du mois précédent
+  return spmWindow.map((d) => (d <= 0 ? d + 30 : d)); // ajustement simple pour mois de 30 jours
 };
 
 export const getCurrentCycleDay = (lastPeriodDate: string): number => {

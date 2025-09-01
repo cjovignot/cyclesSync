@@ -79,6 +79,7 @@ export interface DashboardStats {
   averagePeriodLength: number;
   lastPeriodDate: string;
   totalCycles: number;
+  SPMDays: number[];
 }
 
 // -------------------- Types --------------------
@@ -128,11 +129,15 @@ export interface Predictions {
   fertileWindow: { start: string; end: string };
 }
 
-export type CycleCircleProps = {
+export interface CycleCircleProps {
   averageCycleLength: number;
   currentCycleDay: number;
   periodDays: number[];
-  predictedPeriodDays: number[];
+  periodStartDay: number;
+  periodEndDay: number;
   ovulationDay: number;
   fertileWindow: { start: number; end: number };
-};
+  predictedPeriodDays?: number[];
+  SPMDays?: number[];
+  onSelectedDayChange?: (day: number) => void; // callback pour remonter selectedDay
+}

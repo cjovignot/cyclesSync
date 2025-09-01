@@ -131,6 +131,12 @@ export function appReducer(state: AppState, action: AppAction): AppState {
       );
       const currentCycleDay = getCurrentCycleDay(lastPeriodDate);
 
+      // Calcul des jours de SPM pour le prochain cycle
+      const SPMDays = Array.from(
+        { length: 5 },
+        (_, i) => avgCycleLength - 4 + i
+      );
+
       // Mettre à jour le dernier cycle avec les prédictions
       const updatedCycles = state.cycles.map((cycle, idx) => ({
         ...cycle,
@@ -151,6 +157,7 @@ export function appReducer(state: AppState, action: AppAction): AppState {
         nextPredictedPeriod,
         currentCycleDay,
         totalCycles: state.cycles.length,
+        SPMDays: SPMDays, // <- jours de SPM calculés ici
       };
 
       return { ...state, stats, cycles: updatedCycles };

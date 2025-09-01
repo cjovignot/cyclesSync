@@ -6,6 +6,7 @@ interface CalendarDayProps {
   day: CycleDay;
   isCurrentMonth: boolean;
   isToday: boolean;
+  isSPM?: boolean;
   onClick: () => void;
 }
 
@@ -13,6 +14,7 @@ export function CalendarDay({
   day,
   isCurrentMonth,
   isToday,
+  isSPM = false, // valeur par défaut
   onClick,
 }: CalendarDayProps) {
   const dayNumber = dayjs(day.date).date();
@@ -67,6 +69,13 @@ export function CalendarDay({
       );
     }
 
+    if (isSPM) {
+      return clsx(
+        baseStyles,
+        "border-2 border-yellow-300 text-yellow-600 hover:bg-yellow-50 dark:hover:bg-yellow-900/20"
+      );
+    }
+
     return clsx(
       baseStyles,
       "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -83,7 +92,7 @@ export function CalendarDay({
       <span className="z-10">{dayNumber}</span>
 
       {/* Indicators */}
-      <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 flex space-x-1">
+      <div className="absolute flex space-x-1 transform -translate-x-1/2 bottom-1 left-1/2">
         {hasSymptoms && (
           <div className="w-1.5 h-1.5 bg-purple-400 rounded-full"></div>
         )}
