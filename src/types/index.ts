@@ -1,4 +1,5 @@
 import { storage } from "../utils/storage";
+import type { View } from "../contexts/AppContext";
 
 export interface CycleDay {
   date: string;
@@ -87,7 +88,7 @@ export interface AppState {
   user: User | null;
   cycles: Cycle[];
   preferences: UserPreferences;
-  currentView: "cycle" | "calendar" | "dashboard" | "input" | "settings";
+  currentView: View;
   selectedDate: string | null;
   isLoading: boolean;
   stats: DashboardStats | null;

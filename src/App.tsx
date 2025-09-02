@@ -2,6 +2,7 @@ import { useState } from "react";
 import { AppProvider, useApp } from "./contexts/AppContext";
 import { Header } from "./components/Layout/Header";
 import { Navigation } from "./components/Layout/Navigation";
+import { BottomNav } from "./components/Layout/BottomNav";
 import { DashboardView } from "./components/Dashboard/DashboardView";
 import { CycleCircleView } from "./components/CycleCircle/CycleCircleView";
 import { InputView } from "./components/Input/InputView";
@@ -72,6 +73,7 @@ function AppContent() {
           )}
 
           <div className="animate-fade-in">{renderCurrentView()}</div>
+          <BottomNav />
         </main>
       </div>
     </div>

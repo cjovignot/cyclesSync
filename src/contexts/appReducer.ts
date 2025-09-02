@@ -8,6 +8,7 @@ import {
   predictNextPeriod,
   predictOvulation,
 } from "../utils/cycleCalculations";
+import type { View } from "./AppContext";
 
 // -------------------- Reducer --------------------
 export function appReducer(state: AppState, action: AppAction): AppState {
@@ -94,9 +95,8 @@ export function appReducer(state: AppState, action: AppAction): AppState {
 
     case "SET_PREFERENCES":
       return { ...state, preferences: action.payload };
-
     case "SET_VIEW":
-      return { ...state, currentView: action.payload };
+      return { ...state, currentView: action.payload as View };
 
     case "SET_SELECTED_DATE":
       return { ...state, selectedDate: action.payload };

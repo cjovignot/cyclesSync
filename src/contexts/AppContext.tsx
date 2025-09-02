@@ -15,11 +15,19 @@ export const initialState: AppState = {
   user: null,
   cycles: [],
   preferences: storage.getPreferences(),
-  currentView: "calendar",
+  currentView: "cycle",
   selectedDate: null,
   isLoading: true,
   stats: null,
 };
+
+export type View =
+  | "cycle"
+  | "calendar"
+  | "dashboard"
+  | "input"
+  | "settings"
+  | "home";
 
 // -------------------- Provider --------------------
 export function AppProvider({ children }: { children: React.ReactNode }) {
