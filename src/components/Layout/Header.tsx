@@ -1,7 +1,10 @@
 import { Settings, Sun, Moon } from "lucide-react";
 import { useApp } from "../../contexts/AppContext";
+interface HeaderProps {
+  onMenuClick?: () => void;
+}
 
-export function Header() {
+export function Header({ onMenuClick }: HeaderProps) {
   const { state, dispatch } = useApp();
   const { preferences } = state;
 
@@ -20,6 +23,14 @@ export function Header() {
       </h1>
 
       <div className="flex items-center gap-4">
+        {onMenuClick && (
+          <button
+            onClick={onMenuClick}
+            className="p-2 text-gray-600 md:hidden dark:text-gray-300"
+          >
+            {/* icône hamburger */}
+          </button>
+        )}
         <button
           onClick={toggleTheme}
           className="text-gray-600 dark:text-gray-300 hover:text-primary-600"
@@ -31,8 +42,11 @@ export function Header() {
           )}
         </button>
 
-        <button className="text-gray-600 dark:text-gray-300 hover:text-primary-600">
-          <Settings className="w-5 h-5" />
+        <button
+          className="text-gray-600 dark:text-gray-300 hover:text-primary-600"
+          onClick={() => dispatch({ type: "SET_VIEW", payload: "settings" })}
+        >
+          <Settings onClick={onMenuClick} className="w-5 h-5" />
         </button>
       </div>
     </header>
