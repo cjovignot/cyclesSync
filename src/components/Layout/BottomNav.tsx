@@ -34,9 +34,9 @@ export function BottomNav() {
         </button>
 
         <button
-          onClick={() => setView("calendar")}
+          onClick={() => setView("cycle")}
           className={`flex flex-col items-center text-xs ${
-            currentView === "calendar"
+            currentView === "cycle"
               ? "text-primary-600"
               : "text-gray-600 dark:text-gray-300"
           }`}
@@ -46,8 +46,12 @@ export function BottomNav() {
         </button>
 
         <button
-          onClick={toggleTheme}
-          className="flex flex-col items-center text-xs text-gray-600 dark:text-gray-300"
+          onClick={() => setView("calendar")}
+          className={`flex flex-col items-center text-xs ${
+            currentView === "calendar"
+              ? "text-primary-600"
+              : "text-gray-600 dark:text-gray-300"
+          }`}
         >
           <Calendar className="w-5 h-5" />
           Calendrier
