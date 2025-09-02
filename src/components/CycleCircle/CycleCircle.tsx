@@ -19,8 +19,8 @@ export function CycleCircle(props: CycleCircleProps) {
     onSelectedDayChange,
   } = props;
 
-  const radius = 125;
-  const dotSize = 10;
+  const radius = 150;
+  const dotSize = 13;
   const padding = dotSize + 8; // espace supplémentaire pour contour vert
   const center = radius + padding;
 
@@ -98,7 +98,7 @@ export function CycleCircle(props: CycleCircleProps) {
           const y = center + radius * Math.sin(angle);
           const dayNumber = i + 1;
           const isSelected = dayNumber === selectedDay;
-          const r = dotSize - 3;
+          const r = dotSize - 4;
 
           return (
             <g key={dayNumber}>
@@ -107,10 +107,10 @@ export function CycleCircle(props: CycleCircleProps) {
                 <circle
                   cx={x}
                   cy={y}
-                  r={dotSize + 4}
+                  r={dotSize + 3}
                   fill="none"
-                  stroke="#22c55e"
-                  strokeWidth={2}
+                  stroke="#84cf9fff"
+                  strokeWidth={3}
                 />
               )}
               <motion.circle
