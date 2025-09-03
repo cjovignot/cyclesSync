@@ -21,7 +21,7 @@ export function CycleCircleView() {
 
   return (
     <div className="max-w-md p-4 mx-auto">
-      <h2 className="mb-4 mb-16 text-2xl font-semibold text-gray-900 dark:text-white">
+      <h2 className="mb-4 mb-16 text-3xl font-semibold text-gray-900 dark:text-white">
         Jour {selectedDay} / {stats.averageCycleLength}
       </h2>
 

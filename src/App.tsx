@@ -72,7 +72,7 @@ function AppContent() {
             </div>
           )}
 
-          <div className="animate-fade-in">{renderCurrentView()}</div>
+          <div className="pb-16 animate-fade-in">{renderCurrentView()}</div>
           <BottomNav />
         </main>
       </div>

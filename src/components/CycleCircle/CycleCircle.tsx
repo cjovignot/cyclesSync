@@ -65,12 +65,8 @@ export function CycleCircle(props: CycleCircleProps) {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center">
-      <svg
-        width={radius * 2 + padding * 2}
-        height={radius * 2 + padding * 2}
-        className="mb-6"
-      >
+    <div className="flex flex-col items-center justify-center mt-24">
+      <svg width={radius * 2 + padding * 2} height={radius * 2 + padding * 2}>
         <defs>
           {Array.from({ length: averageCycleLength }).map((_, i) => {
             const dayNumber = i + 1;

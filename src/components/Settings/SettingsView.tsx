@@ -72,15 +72,15 @@ export function SettingsView() {
   };
 
   return (
-    <div className="mx-auto p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+    <div className="p-4 mx-auto">
+      <div className="bg-white border border-gray-200 shadow-sm dark:bg-gray-800 rounded-xl dark:border-gray-700">
         {/* Header */}
         <div className="flex items-center p-6 border-b border-gray-200 dark:border-gray-700">
           <button
             onClick={handleBack}
-            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors mr-3"
+            className="p-2 mr-3 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
           >
-            <ArrowLeft className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+            <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
           </button>
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
             Paramètres
@@ -91,7 +91,7 @@ export function SettingsView() {
           {/* Theme Settings */}
           <div>
             <div className="flex items-center mb-4">
-              <Palette className="h-5 w-5 text-gray-600 dark:text-gray-400 mr-2" />
+              <Palette className="w-5 h-5 mr-2 text-gray-600 dark:text-gray-400" />
               <h3 className="font-semibold text-gray-900 dark:text-white">
                 Apparence
               </h3>
@@ -121,14 +121,14 @@ export function SettingsView() {
           {/* Cycle Settings */}
           <div>
             <div className="flex items-center mb-4">
-              <User className="h-5 w-5 text-gray-600 dark:text-gray-400 mr-2" />
+              <User className="w-5 h-5 mr-2 text-gray-600 dark:text-gray-400" />
               <h3 className="font-semibold text-gray-900 dark:text-white">
                 Cycle
               </h3>
             </div>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                   Durée moyenne du cycle (jours)
                 </label>
                 <input
@@ -141,11 +141,11 @@ export function SettingsView() {
                   }
                   min="21"
                   max="35"
-                  className="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg dark:border-gray-600 focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                   Durée moyenne des règles (jours)
                 </label>
                 <input
@@ -158,7 +158,7 @@ export function SettingsView() {
                   }
                   min="3"
                   max="8"
-                  className="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg dark:border-gray-600 focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 />
               </div>
             </div>
@@ -167,7 +167,7 @@ export function SettingsView() {
           {/* Notifications */}
           <div>
             <div className="flex items-center mb-4">
-              <Bell className="h-5 w-5 text-gray-600 dark:text-gray-400 mr-2" />
+              <Bell className="w-5 h-5 mr-2 text-gray-600 dark:text-gray-400" />
               <h3 className="font-semibold text-gray-900 dark:text-white">
                 Notifications
               </h3>
@@ -183,7 +183,7 @@ export function SettingsView() {
                   onChange={(e) =>
                     updatePreferences({ remindersPeriod: e.target.checked })
                   }
-                  className="w-5 h-5 text-primary-600 rounded focus:ring-primary-500"
+                  className="w-5 h-5 rounded text-primary-600 focus:ring-primary-500"
                 />
               </label>
               <label className="flex items-center justify-between">
@@ -196,7 +196,7 @@ export function SettingsView() {
                   onChange={(e) =>
                     updatePreferences({ remindersFertile: e.target.checked })
                   }
-                  className="w-5 h-5 text-primary-600 rounded focus:ring-primary-500"
+                  className="w-5 h-5 rounded text-primary-600 focus:ring-primary-500"
                 />
               </label>
             </div>
@@ -205,7 +205,7 @@ export function SettingsView() {
           {/* Data Management */}
           <div>
             <div className="flex items-center mb-4">
-              <Globe className="h-5 w-5 text-gray-600 dark:text-gray-400 mr-2" />
+              <Globe className="w-5 h-5 mr-2 text-gray-600 dark:text-gray-400" />
               <h3 className="font-semibold text-gray-900 dark:text-white">
                 Données
               </h3>
@@ -213,14 +213,14 @@ export function SettingsView() {
             <div className="space-y-3">
               <button
                 onClick={handleExport}
-                className="w-full flex items-center justify-center py-3 px-4 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-gray-700 dark:text-gray-300"
+                className="flex items-center justify-center w-full px-4 py-3 text-gray-700 transition-colors border border-gray-200 rounded-lg dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 dark:text-gray-300"
               >
-                <Download className="h-5 w-5 mr-2" />
+                <Download className="w-5 h-5 mr-2" />
                 Exporter mes données
               </button>
 
-              <label className="w-full flex items-center justify-center py-3 px-4 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-gray-700 dark:text-gray-300 cursor-pointer">
-                <Upload className="h-5 w-5 mr-2" />
+              <label className="flex items-center justify-center w-full px-4 py-3 text-gray-700 transition-colors border border-gray-200 rounded-lg cursor-pointer dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 dark:text-gray-300">
+                <Upload className="w-5 h-5 mr-2" />
                 Importer des données
                 <input
                   type="file"
@@ -232,11 +232,14 @@ export function SettingsView() {
 
               <button
                 onClick={handleClearData}
-                className="w-full flex items-center justify-center py-3 px-4 border border-red-200 dark:border-red-600 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors text-red-600 dark:text-red-400"
+                className="flex items-center justify-center w-full px-4 py-3 text-red-600 transition-colors border border-red-200 rounded-lg dark:border-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 dark:text-red-400"
               >
-                <Trash2 className="h-5 w-5 mr-2" />
+                <Trash2 className="w-5 h-5 mr-2" />
                 Supprimer toutes les données
               </button>
+              <span className="flex justify-center pt-10 text-xs">
+                Version Alpha 1.0.3
+              </span>
             </div>
           </div>
         </div>
